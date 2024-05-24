@@ -56,6 +56,36 @@ export const signup = async (req, res, next) => {
   }
 };
 
-export const login = (req, res) => {
-  res.send("Login from controller");
+//login
+export const login = async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return next(errorHandler(400, "All fields are required"));
+    }
+    const user = await User.findOne({ username });
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      user?.password || ""
+    );
+
+    if (!user || !isPasswordCorrect) {
+      return next(errorHandler(400, "Invalid username or password"));
+    }
+    generateTokenAndSetCookie(user._id, res);
+    const { password: removePassword, ...rest } = user._doc;
+    res.status(201).json(rest);
+  } catch (error) {
+    next(error);
+  }
+};
+
+//logout
+export const logout = (req, res, next) => {
+  try {
+    res.cookie("jwt", "", { maxAge: 0 });
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    next(error);
+  }
 };
