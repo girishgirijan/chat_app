@@ -5,6 +5,7 @@ import Login from "./pages/login/Login";
 import Signup from "./pages/signup/Signup";
 import Home from "./pages/home/Home";
 import { useAuthContext } from "./context/authContext";
+import NotFoundPage from "./pages/notfound/NotFoundPage";
 
 function App() {
   const { authUser } = useAuthContext();
@@ -20,6 +21,7 @@ function App() {
           path="/signup"
           element={authUser ? <Navigate to="/" /> : <Signup />}
         />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <Toaster />
     </div>
